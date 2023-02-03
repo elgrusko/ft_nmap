@@ -2,6 +2,8 @@
 
 extern t_nmap nmap;
 
+
+// arbitrary code given by chatgpt (dangerous code)
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
     int     offset;
@@ -34,6 +36,7 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
     strncpy(nmap.pcap_filter, temp, strlen(temp) + 1);
 }
 
+// parsing ports given in param
 void   store_ports(char **ports_list)
 {
     uint16_t    index;
@@ -67,6 +70,7 @@ void   store_ports(char **ports_list)
     }
 }
 
+// parsing ports given in param
 void   parse_range_ports(char *range)
 {
     uint16_t    low_range;
@@ -98,6 +102,7 @@ void   parse_range_ports(char *range)
     ft_split_free(split);
 }
 
+// parsing ports given in param
 int    parse_ports(char **argv, uint8_t index)
 {
     char        **ports_list;

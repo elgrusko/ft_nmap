@@ -44,6 +44,7 @@ void    check_responseless_ports(void)
     }
 }
 
+// when many scans are given in param, then we have to "reset" ports state before new scan type starts
 void    reset_ports(void)
 {
     uint16_t index;
@@ -58,6 +59,7 @@ void    reset_ports(void)
     }
 }
 
+// to sync thread. each thread looks for a port which has not been already scanned
 uint16_t    get_available_port(void)
 {
     uint16_t index;
