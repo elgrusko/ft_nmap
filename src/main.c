@@ -87,15 +87,12 @@ void    run_tcp_scan(void)
     pcap_t                  *handle;
     char                    errbuf[PCAP_ERRBUF_SIZE];
     int                     index;
-    struct timeval          begin;
-    //struct timeval          end;
 
     index = 0;
     if (!(handle = pcap_open_live(nmap.interface, BUFSIZ, 1, 1000, errbuf)))
         ft_exerror(errbuf, errno);
     manage_filter(handle);
     pthread_mutex_init(&mutex_global, NULL);
-    save_current_time(&begin);
     pthread_create(&nmap.capture_thread, NULL, capture_thread, handle);
     for (index = 0; index < nmap.speedup; index++)
         pthread_create(&nmap.main_threads[index], NULL, scan_thread, NULL);
@@ -105,16 +102,17 @@ void    run_tcp_scan(void)
         scan_thread(NULL);
     sleep(1);
     nmap.stop_capture = 1;  //ask capture thread to stop capturing
-    //save_current_time(&end);
     pthread_mutex_destroy(&mutex_global);
     check_responseless_ports();
     pcap_close(handle);
     print_result();
-    //display_request_time(begin, end);
 }
 
 int     main(int argc, char **argv)
 {
+    uint8_t tmp_scans;
+
+    tmp_scans = 0;
     if (getuid() != 0)
         return (ft_reterror("you must be root to use ft_nmap", 1));
     else if (argc < 2 || parse_parameters(argv) != 0)
@@ -126,6 +124,7 @@ int     main(int argc, char **argv)
     if (get_network_interface() != 0)
         return (ft_reterror("no available interface found", 3));
     display_scan_config();
+    tmp_scans = nmap.scans;
     while (nmap.targets)
     {
         while (nmap.scans)
@@ -134,8 +133,9 @@ int     main(int argc, char **argv)
             run_tcp_scan();
             nmap.remain_ports = get_total_ports();
             reset_ports();
-            nmap.targets = nmap.targets->next;
         }
+        nmap.scans = tmp_scans;
+        nmap.targets = nmap.targets->next;
     }
     return (0);
 }

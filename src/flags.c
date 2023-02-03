@@ -27,7 +27,7 @@ void    set_correct_flags(void)
     }
     else if (nmap.scans & SCAN_XMAS)
     {
-        nmap.flags |= (FLAG_FIN & FLAG_PSH & FLAG_URG);
+        nmap.flags |= (FLAG_FIN | FLAG_PSH | FLAG_URG);
         nmap.scans ^= SCAN_XMAS;
         nmap.current_scan_type = SCAN_XMAS;
     }
@@ -107,12 +107,10 @@ int     parse_parameters(char **argv)
         }
         else if (ft_strcmp("--ip", argv[index]) == 0)
         {
-            while (argv[index + 1] && strncmp(argv[index + 1], "--", 2) != 0)
-            {
-                interpret_addr(argv[index + 1]);
-                index++;
-            }
-            //print_list();
+            if (argv[index + 1] != NULL)
+                if (interpret_addr(argv[index + 1]) != 0)
+                    return (E_ERR);
+            index++;
         }
         else if (ft_strcmp("--scan", argv[index]) == 0)
         {

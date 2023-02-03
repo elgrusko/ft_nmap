@@ -33,14 +33,11 @@ void    check_responseless_ports(void)
     index = 0;
     while (nmap.t_ports[index].dst_port != 0)
     {
-        if (nmap.current_scan_type == SCAN_SYN)
+        if (nmap.t_ports[index].state == NO_RESPONSE)
         {
-            if (nmap.t_ports[index].state == NO_RESPONSE) // NO_RESPONSE == 0b00000000
+            if (nmap.current_scan_type == SCAN_SYN)
                 nmap.t_ports[index].state |= FILTERED;
-        }
-        else if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN)
-        {
-            if (nmap.t_ports[index].state == NO_RESPONSE)
+            else if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN || nmap.current_scan_type == SCAN_XMAS)
                 nmap.t_ports[index].state |= OPENFILTERED;
         }
         index++;

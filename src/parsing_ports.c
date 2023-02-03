@@ -5,7 +5,7 @@ extern t_nmap nmap;
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
     int     offset;
-    char    temp[1000];
+    char    temp[1000]; // a changer aussi
     char    *token;
 
     offset = 0;
