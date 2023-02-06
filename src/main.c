@@ -115,14 +115,16 @@ int     main(int argc, char **argv)
     tmp_scans = 0;
     if (getuid() != 0)
         return (ft_reterror("you must be root to use ft_nmap", 1));
-    else if (argc < 2 || parse_parameters(argv) != 0)
+    if (argc < 2 || parse_parameters(argv) != 0)
         return (ft_reterror(USAGE, 2));
-    else if (nmap.flags & FLAG_HELP)
+    if (nmap.flags & FLAG_HELP)
         return (ft_reterror(HELP, 0));
     if (create_socket() != 0)
         return (ft_reterror(strerror(errno), errno));
     if (get_network_interface() != 0)
         return (ft_reterror("no available interface found", 3));
+    if (!nmap.targets)
+        return (ft_reterror("no target. please check --help", 4));
     display_scan_config();
     tmp_scans = nmap.scans;
     while (nmap.targets)

@@ -2,7 +2,6 @@
 
 extern t_nmap nmap;
 
-
 // arbitrary code given by chatgpt (dangerous code)
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
@@ -100,34 +99,4 @@ void   parse_range_ports(char *range)
         }
     }
     ft_split_free(split);
-}
-
-// parsing ports given in param
-int    parse_ports(char **argv, uint8_t index)
-{
-    char        **ports_list;
-    uint16_t    tmp;
-
-    ports_list = NULL;
-    if (argv[index] != NULL)
-    {
-        nmap.string_ports = argv[index];
-        if (strchr(argv[index], ','))       // if it's ports separared by comma
-        {
-            if ((ports_list = ft_split(argv[index], ',')))
-                store_ports(ports_list);
-        }
-        else if (strchr(argv[index], '-'))
-            parse_range_ports(argv[index]);
-        else                               // only one port
-        {
-            tmp = (uint16_t)ft_atoi((const char *)argv[index]);
-            if (tmp < MIN_PORT || tmp > MAX_PORT)
-                ft_reterror("ports to scan must be somewhere between 1-1024", 1);
-            else
-                nmap.t_ports[0].dst_port = tmp;
-        }
-    nmap.remain_ports = get_total_ports();
-    }
-    return (0);
 }

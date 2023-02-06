@@ -1,7 +1,7 @@
 NAME =		ft_nmap
 CC =		gcc
 CFLAGS =	-Wall -Wextra -Werror
-SRCS =		src/main.c src/manage_ports.c src/debug.c src/flags.c src/lst.c src/result.c src/libft.c src/time.c src/display.c src/parsing_ports.c src/addr.c src/fill_headers.c
+SRCS =		src/main.c src/manage_ports.c src/parse_params.c src/debug.c src/flags.c src/lst.c src/result.c src/libft.c src/time.c src/display.c src/parsing_ports.c src/addr.c src/fill_headers.c
 INC =		ft_nmap.h
 OBJS =		$(SRCS:.c=.o)
 
