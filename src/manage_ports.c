@@ -14,14 +14,14 @@ void    update_ports_list(struct tcphdr *tcp_h)
     if (nmap.current_scan_type == SCAN_SYN)
     {
         if (tcp_h->syn && tcp_h->ack)
-            nmap.t_ports[index].state |= OPEN;
+            nmap.t_ports[index].state_res.syn_res |= OPEN;
         else if (tcp_h->rst)
-            nmap.t_ports[index].state |= CLOSE;
+            nmap.t_ports[index].state_res.syn_res |= CLOSE;
     }
     if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN)
     {
         if (tcp_h->rst)
-            nmap.t_ports[index].state |= CLOSE;
+            nmap.t_ports[index].state_res.null_res |= CLOSE;
     }
 }
 
@@ -33,13 +33,14 @@ void    check_responseless_ports(void)
     index = 0;
     while (nmap.t_ports[index].dst_port != 0)
     {
-        if (nmap.t_ports[index].state == NO_RESPONSE)
-        {
-            if (nmap.current_scan_type == SCAN_SYN)
-                nmap.t_ports[index].state |= FILTERED;
-            else if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN || nmap.current_scan_type == SCAN_XMAS)
-                nmap.t_ports[index].state |= OPENFILTERED;
-        }
+        if (nmap.current_scan_type == SCAN_SYN && nmap.t_ports[index].state_res.syn_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.syn_res |= FILTERED;
+        if (nmap.current_scan_type == SCAN_NULL && nmap.t_ports[index].state_res.null_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.null_res |= OPENFILTERED;
+        if (nmap.current_scan_type == SCAN_FIN && nmap.t_ports[index].state_res.fin_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.fin_res |= OPENFILTERED;  
+        if (nmap.current_scan_type == SCAN_XMAS && nmap.t_ports[index].state_res.xmas_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.xmas_res |= OPENFILTERED;
         index++;
     }
 }
@@ -54,7 +55,6 @@ void    reset_ports(void)
     {
         nmap.t_ports[index].src_port = 0;
         nmap.t_ports[index].scanned = 0;
-        nmap.t_ports[index].state = 0;
         index++;
     }
 }

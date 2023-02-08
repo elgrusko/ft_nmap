@@ -65,7 +65,7 @@ enum errors {E_OK, E_ERR};
 enum scanned {E_NOT_SCANNED, E_SCANNED};
 enum scan_types {SYN, NUL, ACK, FIN, XMAS, UDP};
 
-typedef struct              s_ports_result
+typedef struct              s_ports_result // total ports state
 {
     uint16_t                open_ports;
     uint16_t                close_ports;
@@ -74,12 +74,24 @@ typedef struct              s_ports_result
     uint16_t                unfiltered_ports;
 }                           t_ports_result;
 
+
+// each scan result for each port
+typedef struct              s_state
+{
+    uint8_t                 syn_res;
+    uint8_t                 null_res;
+    uint8_t                 fin_res;
+    uint8_t                 xmas_res;
+    uint8_t                 ack_res;
+    uint8_t                 udp_res;
+}                           t_state;
+
 typedef struct              s_ports
 {
     uint16_t                src_port;
     uint16_t                dst_port;
     uint8_t                 scanned; // is the port already been scanned ? (to sync threads)
-    uint8_t                 state;
+    t_state                 state_res;
 }                           t_ports;
 
 typedef struct              s_target
@@ -108,6 +120,7 @@ typedef struct              s_nmap
     uint8_t                 datagram[MAX_PACKET_SIZE];
     struct ip               ip_h;
     struct tcphdr           tcp_h;
+    t_ports_result          result;
     char                    *interface;
     struct timeval			starting_time;
 	struct timeval			ending_time;

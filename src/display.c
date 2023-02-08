@@ -17,29 +17,32 @@ char   *state_to_string(u_int8_t state)
     return (NULL);
 }
 
+void    print_scans_type_res(uint16_t index)
+{
+    printf("%d\t", nmap.t_ports[index].dst_port);
+    if (nmap.t_ports[index].state_res.syn_res)
+        printf("SYN(%s) ", state_to_string(nmap.t_ports[index].state_res.syn_res));
+    if (nmap.t_ports[index].state_res.null_res)
+        printf("NULL(%s) ", state_to_string(nmap.t_ports[index].state_res.null_res));
+    printf("\n");
+}
+
 void    print_result(void)
 {
     uint16_t        index = 0;
-    t_ports_result  result = {0};
 
-    get_total_state_ports(&result);
+    //get_total_state_ports(&nmap.result); // fonction to be updated since we use t_state struct
     printf("\nScan result:\n");
-    if (nmap.current_scan_type == SCAN_SYN)
-        printf("open : %d / close : %d / filtered : %d\n", result.open_ports, result.close_ports, result.filtered_ports);
-    else if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN || nmap.current_scan_type == SCAN_XMAS)
-        printf("filtered : %d / close : %d / open|filtered : %d\n", result.open_ports, result.close_ports, result.openfiltered_ports);
-    if (result.open_ports || result.close_ports || result.filtered_ports || result.openfiltered_ports || result.unfiltered_ports)
+    printf("open: %d / close: %d / filtered: %d / open|filtered: %d / unfiltered %d\n", nmap.result.open_ports, nmap.result.close_ports, nmap.result.filtered_ports, nmap.result.openfiltered_ports, nmap.result.unfiltered_ports);
+    //if (nmap.result.open_ports || nmap.result.close_ports || nmap.result.filtered_ports || nmap.result.openfiltered_ports || nmap.result.unfiltered_ports)
+    //{
+    printf("\nPORT\t STATE\n");
+    while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
     {
-        printf("\nPORT\t STATE\n");
-        while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
-        {
-            if ((nmap.t_ports[index].state == FILTERED && result.filtered_ports > 30) || (nmap.t_ports[index].state == CLOSE && result.close_ports > 30) || (nmap.t_ports[index].state == OPENFILTERED && result.openfiltered_ports > 30))
-                ;
-            else
-                printf("%d\t%s\n", nmap.t_ports[index].dst_port, state_to_string(nmap.t_ports[index].state));
-            index++;
-        }
+        print_scans_type_res(index);
+        index++;
     }
+    //}
 }
 
 void    display_scan_config(void)

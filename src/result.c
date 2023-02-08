@@ -10,7 +10,7 @@ uint16_t    get_total_ports(void)
     return (total);
 }
 
-void     get_total_state_ports(t_ports_result *result)
+/*void     get_total_state_ports(t_ports_result *result)
 {
     for (uint16_t index = 0; nmap.t_ports[index].dst_port != 0 && index < MAX_PORT; index++)
     {
@@ -36,4 +36,4 @@ void     get_total_state_ports(t_ports_result *result)
             }
         }
     }
-}
+}*/
