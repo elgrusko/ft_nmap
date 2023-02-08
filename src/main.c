@@ -48,14 +48,25 @@ pcap_t      *manage_filter(pcap_t *handle)
     return (handle);
 }
 
+void    send_syn_first(struct tcphdr *tcp_h, struct ip *ip_h, uint16_t port_index)
+{
+    uint8_t flags_save;
+
+    flags_save = nmap.flags;
+    nmap.flags = FLAG_SYN;
+    fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
+    send_packet(ip_h);
+    nmap.flags = flags_save;
+}
+
 void    *scan_thread(void *arg)
 {
     struct ip       *ip_h;
     struct tcphdr   *tcp_h;
     uint16_t        port_index;
     struct timeval  current_start_timestamp;
-    
-    if (arg)
+
+    if (arg) // avoid warning while compiling
         arg = arg;
     while (1)
     {
@@ -72,6 +83,8 @@ void    *scan_thread(void *arg)
         ip_h = (struct ip*)nmap.datagram;
         tcp_h = (struct tcphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
         fill_ip_header(ip_h);
+        if (nmap.current_scan_type == SCAN_ACK) // if ACK scan, then we have to send a SYN packet first
+            send_syn_first(tcp_h, ip_h, port_index);
         fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
         send_packet(ip_h);
         nmap.t_ports[port_index].src_port = START_SRC_PORT + nmap.t_ports[port_index].dst_port;
@@ -121,7 +134,6 @@ int     main(int argc, char **argv)
         return (ft_reterror("no available interface found", 3));
     if (!nmap.targets)
         return (ft_reterror("no target. please check --help", 4));
-    print_list();
     display_scan_config();
     tmp_scans = nmap.scans;
     if (!(handle = pcap_open_live(nmap.interface, BUFSIZ, 1, 1000, errbuf)))

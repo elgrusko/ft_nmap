@@ -35,7 +35,7 @@ void    set_correct_flags(void)
     {
         nmap.flags |= FLAG_ACK;
         nmap.scans ^= SCAN_ACK;
-        nmap.current_scan_type = SCAN_XMAS;
+        nmap.current_scan_type = SCAN_ACK;
     }
     else if (nmap.scans & SCAN_UDP)
     {

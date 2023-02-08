@@ -46,8 +46,8 @@ void	fill_tcp_header(struct tcphdr *tcp_h, u_int16_t src_port, u_int16_t dst_por
 {
 	tcp_h->source = htons(START_SRC_PORT + src_port);
 	tcp_h->dest = htons(dst_port);
-	tcp_h->seq = htonl(1);
-	tcp_h->ack_seq = htonl(1);
+	tcp_h->seq = htonl(0);
+	tcp_h->ack_seq = htonl(0);
 	tcp_h->doff = (sizeof(struct tcphdr) >> 2);
 	tcp_h->fin = (nmap.flags & FLAG_FIN) ? 1 : 0;
 	tcp_h->syn = (nmap.flags & FLAG_SYN) ? 1 : 0;

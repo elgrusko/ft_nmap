@@ -24,6 +24,14 @@ void    print_scans_type_res(uint16_t index)
         printf("SYN(%s) ", state_to_string(nmap.t_ports[index].state_res.syn_res));
     if (nmap.t_ports[index].state_res.null_res)
         printf("NULL(%s) ", state_to_string(nmap.t_ports[index].state_res.null_res));
+    if (nmap.t_ports[index].state_res.fin_res)
+        printf("FIN(%s) ", state_to_string(nmap.t_ports[index].state_res.fin_res));
+    if (nmap.t_ports[index].state_res.xmas_res)
+        printf("XMAS(%s) ", state_to_string(nmap.t_ports[index].state_res.xmas_res));
+    if (nmap.t_ports[index].state_res.ack_res)
+        printf("ACK(%s) ", state_to_string(nmap.t_ports[index].state_res.ack_res));
+    if (nmap.t_ports[index].state_res.udp_res)
+        printf("UDP(%s) ", state_to_string(nmap.t_ports[index].state_res.udp_res));
     printf("\n");
 }
 

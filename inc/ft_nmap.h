@@ -126,6 +126,7 @@ typedef struct              s_nmap
 	struct timeval			ending_time;
 }                           t_nmap;
 
+
 //time
 void	    wait_interval(struct timeval start, long interval);
 double	    calcul_request_time(struct timeval start, struct timeval end);

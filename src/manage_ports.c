@@ -18,10 +18,15 @@ void    update_ports_list(struct tcphdr *tcp_h)
         else if (tcp_h->rst)
             nmap.t_ports[index].state_res.syn_res |= CLOSE;
     }
-    if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN)
+    else if (nmap.current_scan_type == SCAN_NULL || nmap.current_scan_type == SCAN_FIN || nmap.current_scan_type == SCAN_XMAS)
     {
         if (tcp_h->rst)
             nmap.t_ports[index].state_res.null_res |= CLOSE;
+    }
+    else if (nmap.current_scan_type == SCAN_ACK)
+    {
+        if (tcp_h->rst)
+            nmap.t_ports[index].state_res.ack_res |= UNFILTERED;
     }
 }
 
@@ -41,6 +46,8 @@ void    check_responseless_ports(void)
             nmap.t_ports[index].state_res.fin_res |= OPENFILTERED;  
         if (nmap.current_scan_type == SCAN_XMAS && nmap.t_ports[index].state_res.xmas_res == NO_RESPONSE)
             nmap.t_ports[index].state_res.xmas_res |= OPENFILTERED;
+        if (nmap.current_scan_type == SCAN_ACK && nmap.t_ports[index].state_res.ack_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.ack_res |= FILTERED;
         index++;
     }
 }
