@@ -44,13 +44,13 @@ void    check_responseless_ports(void)
     }
 }
 
-// when many scans are given in param, then we have to "reset" ports state before new scan type starts
+// when many scans are given in param, then we have to "reset" ports states in our tab before new scan type starts
 void    reset_ports(void)
 {
     uint16_t index;
 
     index = 0;
-    while (nmap.t_ports[index].dst_port != 0)
+    while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
     {
         nmap.t_ports[index].src_port = 0;
         nmap.t_ports[index].scanned = 0;

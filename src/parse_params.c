@@ -2,6 +2,27 @@
 
 extern t_nmap nmap;
 
+int     file_to_targets(char *filename)
+{
+    FILE    *fd;
+    char    buffer[256];
+
+    fd = NULL;
+    if (filename)
+    {
+        if (!(fd = fopen(filename, "r+")))
+            return (ft_reterror(strerror(errno), E_ERR));
+        while (fgets(buffer, sizeof(buffer), fd) != NULL)
+        {
+            buffer[strlen(buffer) - 1] = '\0'; // eat the newline fgets() stores
+            if (interpret_addr(buffer) != E_OK)
+                return (E_ERR);
+        }
+        fclose(fd);
+    }
+    return (E_OK);
+}
+
 int     parse_parameters(char **argv)
 {
     uint16_t    index;
@@ -24,15 +45,17 @@ int     parse_parameters(char **argv)
         else if (ft_strcmp("--ip", argv[index]) == 0)
         {
             if (argv[index + 1] != NULL)
-                if (interpret_addr(argv[index + 1]) != 0)
+                if (interpret_addr(argv[index + 1]) != E_OK)
                     return (E_ERR);
             index++;
         }
-        /*else if (ft_strcmp("--file", argv[index]) == 0)
+        else if (ft_strcmp("--file", argv[index]) == 0)
         {
             if (argv[index + 1] != NULL)
-                file_to_targets(argv[index + 1]);
-        }*/
+                if (file_to_targets(argv[index + 1]) != E_OK)
+                    return (E_ERR);
+            index++;
+        }
         else if (ft_strcmp("--scan", argv[index]) == 0)
         {
             if (argv[index + 1] == NULL || scan_to_flag(argv, index + 1) != E_OK)

@@ -19,8 +19,8 @@ char   *state_to_string(u_int8_t state)
 
 void    print_result(void)
 {
-    uint16_t    index = 0;
-    t_ports_result  result;
+    uint16_t        index = 0;
+    t_ports_result  result = {0};
 
     get_total_state_ports(&result);
     printf("\nScan result:\n");
@@ -33,7 +33,7 @@ void    print_result(void)
         printf("\nPORT\t STATE\n");
         while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
         {
-            if ((nmap.t_ports[index].state == CLOSE && result.close_ports > 30) || (nmap.t_ports[index].state == OPENFILTERED && result.openfiltered_ports > 30))
+            if ((nmap.t_ports[index].state == FILTERED && result.filtered_ports > 30) || (nmap.t_ports[index].state == CLOSE && result.close_ports > 30) || (nmap.t_ports[index].state == OPENFILTERED && result.openfiltered_ports > 30))
                 ;
             else
                 printf("%d\t%s\n", nmap.t_ports[index].dst_port, state_to_string(nmap.t_ports[index].state));

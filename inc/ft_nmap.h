@@ -114,35 +114,35 @@ typedef struct              s_nmap
 }                           t_nmap;
 
 //time
-void	wait_interval(struct timeval start, long interval);
-double	calcul_request_time(struct timeval start, struct timeval end);
-void    save_current_time(struct timeval *destination);
-void	display_request_time(struct timeval start, struct timeval end);
+void	    wait_interval(struct timeval start, long interval);
+double	    calcul_request_time(struct timeval start, struct timeval end);
+void        save_current_time(struct timeval *destination);
+void	    display_request_time(struct timeval start, struct timeval end);
 //configure networking
-int     create_socket(void);
-void	fill_ip_header(struct ip *ip_h);
-void	fill_tcp_header(struct tcphdr *tcp_h, u_int16_t src_port, u_int16_t dst_port);
-int     interpret_addr(char *input);
-int     get_network_interface(void);
-void    send_packet(struct ip *ip_h);
+int         create_socket(void);
+void	    fill_ip_header(struct ip *ip_h);
+void	    fill_tcp_header(struct tcphdr *tcp_h, u_int16_t src_port, u_int16_t dst_port);
+int         interpret_addr(char *input);
+int         get_network_interface(void);
+void        send_packet(struct ip *ip_h);
 //display
-void    print_result(void);
-void    display_ports(void);
-void    display_scan_config(void);
-void    print_memory(void *memory, int size);
+void        print_result(void);
+void        display_ports(void);
+void        display_scan_config(void);
+void        print_memory(void *memory, int size);
 // parameters parsing
-void    nmap_to_pcap(char *nmap_ports, const char *host);
-int     scan_to_flag(char **argv, uint8_t index);
-void    store_ports(char **ports_list);
-void    parse_range_ports(char *range);
-int     parse_parameters(char **argv);
-int     parse_ports(char **argv, uint8_t index);
-void    reset_ports(void);
-void    check_responseless_ports(void);
+void        nmap_to_pcap(char *nmap_ports, const char *host);
+int         scan_to_flag(char **argv, uint8_t index);
+void        store_ports(char **ports_list);
+void        parse_range_ports(char *range);
+int         parse_parameters(char **argv);
+int         parse_ports(char **argv, uint8_t index);
+void        reset_ports(void);
+void        check_responseless_ports(void);
 uint16_t    get_available_port(void);
-void    update_ports_list(struct tcphdr *tcp_h);
-void    set_correct_flags(void);
-
+void        update_ports_list(struct tcphdr *tcp_h);
+void        set_correct_flags(void);
+void        run_tcp_scan(void);
 // tools
 uint16_t    get_total_ports(void);
 void        get_total_state_ports(t_ports_result *result);
@@ -151,16 +151,16 @@ uint16_t    swap_uint16(uint16_t val);
 void        ft_list_push_back(char *ip, struct addrinfo *res);
 t_target    *ft_create_elem(char *ip, struct addrinfo *res);
 void        print_list(void);
-int		is_in_array(int value);
-void	ft_exerror(char *str, int value);
-int     ft_reterror(char *str, int value);
-int		ft_strcmp(const char *s1, const char *s2);
-void	*ft_memset(void *ptr, int value, size_t len);
-char	*ft_strdup(const char *s);
-size_t	ft_strlen(const char *str);
-void	*ft_memcpy(void *dest, const void *src, size_t n);
-int		ft_atoi(const char *str);
-char	**ft_split(char const *s, char c);
-void	ft_split_free(char **split);
+int		    is_in_array(int value);
+void	    ft_exerror(char *str, int value);
+int         ft_reterror(char *str, int value);
+int		    ft_strcmp(const char *s1, const char *s2);
+void	    *ft_memset(void *ptr, int value, size_t len);
+char	    *ft_strdup(const char *s);
+size_t	    ft_strlen(const char *str);
+void	    *ft_memcpy(void *dest, const void *src, size_t n);
+int		    ft_atoi(const char *str);
+char	    **ft_split(char const *s, char c);
+void	    ft_split_free(char **split);
 
 # endif

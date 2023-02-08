@@ -16,10 +16,10 @@ $(NAME): $(OBJS)
 
 clean:
 	@rm -rf $(OBJS)
-	@echo "\033[1;34mft_traceroute\033[1;33m obj files removed\t\033[1;31m✓\033[0m"
+	@echo "\033[1;34mft_nmap\033[1;33m obj files removed\t\033[1;31m✓\033[0m"
 
 fclean: clean
 	@rm -rf $(NAME)
-	@echo "\033[1;34mft_traceroute\033[1;33m files deleted\t\t\033[1;31m✓\033[0m"
+	@echo "\033[1;34mft_nmap\033[1;33m files deleted\t\t\033[1;31m✓\033[0m"
 
 re: fclean all
