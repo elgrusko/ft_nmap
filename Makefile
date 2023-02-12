@@ -3,7 +3,7 @@ MAKEFLAGS += "-j 16"
 NAME =		ft_nmap
 CC =		gcc
 
-CFLAGS =	-I inc
+CFLAGS =	-I inc -O3
 CFLAGS +=	-Wall -Wextra -Werror
 CFLAGS +=	-fsanitize=address -g
 

@@ -150,7 +150,10 @@ int     main(int argc, char **argv)
             reset_ports();
         }
         nmap.scans = tmp_scans;
-        nmap.targets = nmap.targets->next;
+        t_target *next_target = nmap.targets->next;
+        free(nmap.targets->string_ip);
+        free(nmap.targets);
+        nmap.targets = next_target;
     }
     nmap.stop_capture = 1;
     pcap_close(handle);

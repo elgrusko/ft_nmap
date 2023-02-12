@@ -72,8 +72,8 @@ void   store_ports(char **ports_list)
 // parsing ports given in param
 void   parse_range_ports(char *range)
 {
-    uint16_t    low_range;
-    uint16_t    high_range;
+    uint16_t    low_range = 0;
+    uint16_t    high_range = 0;
     uint16_t    index_ports_tab;
     char        **split;
 
