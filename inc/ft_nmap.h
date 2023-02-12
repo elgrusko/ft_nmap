@@ -125,6 +125,7 @@ typedef struct              s_nmap
     char                    *interface;
     struct timeval			starting_time;
 	struct timeval			ending_time;
+    struct bpf_program		filter;
 }                           t_nmap;
 
 extern t_nmap nmap;

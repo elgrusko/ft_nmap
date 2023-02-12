@@ -37,13 +37,12 @@ void *capture_thread(void *arg)
 pcap_t      *manage_filter(pcap_t *handle)
 {
     char                errbuf[PCAP_ERRBUF_SIZE];
-    struct bpf_program  filter;
-    
+
     if (nmap.pcap_filter == NULL)
         nmap_to_pcap(nmap.string_ports, nmap.string_src_ip);
-    if (pcap_compile(handle, &filter, nmap.pcap_filter, 0, PCAP_NETMASK_UNKNOWN) == -1)
+    if (pcap_compile(handle, &nmap.filter, nmap.pcap_filter, 0, PCAP_NETMASK_UNKNOWN) == -1)
         ft_exerror(errbuf, errno);
-    if (pcap_setfilter(handle, &filter) == -1)
+    if (pcap_setfilter(handle, &nmap.filter) == -1)
         ft_exerror(errbuf, errno);
     return (handle);
 }
@@ -140,6 +139,7 @@ int     main(int argc, char **argv)
         ft_exerror(errbuf, errno);
     manage_filter(handle);
     pthread_create(&nmap.capture_thread, NULL, capture_thread, handle);
+
     while (nmap.targets)
     {
         while (nmap.scans)
@@ -150,11 +150,14 @@ int     main(int argc, char **argv)
             reset_ports();
         }
         nmap.scans = tmp_scans;
+
+        // get the next target and free the current one
         t_target *next_target = nmap.targets->next;
         free(nmap.targets->string_ip);
         free(nmap.targets);
         nmap.targets = next_target;
     }
+
     nmap.stop_capture = 1;
     pcap_close(handle);
     return (0);

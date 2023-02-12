@@ -36,15 +36,15 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(SRCS) -lm -lpcap -lpthread
-	@echo -e "\033[1;32mlinked  \033[0;34m ft_nmap\033[40G\033[1;32m✓\033[0m"
+	@echo -e "\033[1;32m  linked\033[0;34m ft_nmap\033[40G\033[1;32m✓\033[0m"
 
 clean:
 	@rm -rf $(OBJS)
-	@echo -e "\033[1;31mremoved \033[0;34m objects files\033[40G\033[1;31m✓\033[0m"
+	@echo -e "\033[1;31m removed\033[0;34m objects files\033[40G\033[1;31m✓\033[0m"
 
 fclean: clean
 	@rm -rf $(NAME)
-	@echo -e "\033[1;31mremoved \033[0;34m ft_nmap\033[40G\033[1;31m✓\033[0m"
+	@echo -e "\033[1;31m removed\033[0;34m ft_nmap\033[40G\033[1;31m✓\033[0m"
 
 re:
 	@make --no-print-directory fclean
