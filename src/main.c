@@ -1,4 +1,4 @@
-#include "../inc/ft_nmap.h"
+#include "ft_nmap.h"
 
 t_nmap          nmap;
 pthread_mutex_t mutex_global;
@@ -55,7 +55,7 @@ void    send_syn_first(struct tcphdr *tcp_h, struct ip *ip_h, uint16_t port_inde
     flags_save = nmap.flags;
     nmap.flags = FLAG_SYN;
     fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
-    send_packet(ip_h);
+    send_packet(nmap.tcp_socket_fd, ip_h);
     nmap.flags = flags_save;
 }
 
@@ -66,8 +66,7 @@ void    *scan_thread(void *arg)
     uint16_t        port_index;
     struct timeval  current_start_timestamp;
 
-    if (arg) // avoid warning while compiling
-        arg = arg;
+    (void)arg;
     while (1)
     {
         pthread_mutex_lock(&mutex_global);
@@ -86,7 +85,7 @@ void    *scan_thread(void *arg)
         //if (nmap.current_scan_type == SCAN_ACK) // if ACK scan, then we have to send a SYN packet first
         //    send_syn_first(tcp_h, ip_h, port_index);
         fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
-        send_packet(ip_h);
+        send_packet(nmap.tcp_socket_fd, ip_h);
         nmap.t_ports[port_index].src_port = START_SRC_PORT + nmap.t_ports[port_index].dst_port;
         usleep(30000 * ((nmap.speedup / 2) + 1)); // arbitraire. a changer
         //wait_interval(current_start_timestamp, 1);
@@ -128,12 +127,13 @@ int     main(int argc, char **argv)
         return (ft_reterror(USAGE, 2));
     if (nmap.flags & FLAG_HELP)
         return (ft_reterror(HELP, 0));
-    if (create_socket() != 0)
+    if (create_tcp_socket() < 0 || create_udp_socket() < 0)
         return (ft_reterror(strerror(errno), errno));
     if (get_network_interface() != 0)
         return (ft_reterror("no available interface found", 3));
     if (!nmap.targets)
         return (ft_reterror("no target. please check --help", 4));
+
     display_scan_config();
     tmp_scans = nmap.scans;
     if (!(handle = pcap_open_live(nmap.interface, BUFSIZ, 1, 1000, errbuf)))

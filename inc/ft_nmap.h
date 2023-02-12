@@ -105,7 +105,8 @@ typedef struct              s_nmap
 {
     int                     speedup;        // 0 to 250 (threads)
     uint8_t                 flags;
-    int                     socket_fd;
+    int                     tcp_socket_fd;
+    int                     udp_socket_fd;
     uint8_t                 current_scan_type;
     t_ports                 t_ports[MAX_PORT];
     uint16_t                remain_ports;
@@ -126,24 +127,29 @@ typedef struct              s_nmap
 	struct timeval			ending_time;
 }                           t_nmap;
 
+extern t_nmap nmap;
 
 //time
 void	    wait_interval(struct timeval start, long interval);
 double	    calcul_request_time(struct timeval start, struct timeval end);
 void        save_current_time(struct timeval *destination);
 void	    display_request_time(struct timeval start, struct timeval end);
+
 //configure networking
-int         create_socket(void);
+int         create_tcp_socket(void);
+int         create_udp_socket(void);
 void	    fill_ip_header(struct ip *ip_h);
 void	    fill_tcp_header(struct tcphdr *tcp_h, u_int16_t src_port, u_int16_t dst_port);
 int         interpret_addr(char *input);
 int         get_network_interface(void);
-void        send_packet(struct ip *ip_h);
+void        send_packet(int sock, struct ip *ip_h);
+
 //display
 void        print_result(void);
 void        display_ports(void);
 void        display_scan_config(void);
 void        print_memory(void *memory, int size);
+
 // parameters parsing
 void        nmap_to_pcap(char *nmap_ports, const char *host);
 int         scan_to_flag(char **argv, uint8_t index);
@@ -157,10 +163,12 @@ uint16_t    get_available_port(void);
 void        update_ports_list(struct tcphdr *tcp_h);
 void        set_correct_flags(void);
 void        run_tcp_scan(void);
+
 // tools
 uint16_t    get_total_ports(void);
 void        get_total_state_ports(t_ports_result *result);
 uint16_t    swap_uint16(uint16_t val);
+
 // libft functions
 void        ft_list_push_back(char *ip, struct addrinfo *res);
 t_target    *ft_create_elem(char *ip, struct addrinfo *res);

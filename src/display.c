@@ -1,6 +1,12 @@
-#include "../inc/ft_nmap.h"
+#include "ft_nmap.h"
 
-extern t_nmap nmap;
+char *get_service_name(int port, const char *protocol) {
+	struct servent *service = getservbyport(port, protocol);
+
+	if (!service)
+		return "Unassigned";
+	return service->s_name;
+}
 
 char   *state_to_string(u_int8_t state)
 {
@@ -32,6 +38,7 @@ void    print_scans_type_res(uint16_t index)
         printf("ACK(%s) ", state_to_string(nmap.t_ports[index].state_res.ack_res));
     if (nmap.t_ports[index].state_res.udp_res)
         printf("UDP(%s) ", state_to_string(nmap.t_ports[index].state_res.udp_res));
+    printf("\t%s", get_service_name(nmap.t_ports[index].dst_port, "tcp"));
     printf("\n");
 }
 

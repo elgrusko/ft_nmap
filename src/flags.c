@@ -1,6 +1,4 @@
-#include "../inc/ft_nmap.h"
-
-extern t_nmap nmap;
+#include "ft_nmap.h"
 
 void    set_correct_flags(void)
 {

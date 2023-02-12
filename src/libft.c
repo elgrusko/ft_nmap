@@ -1,6 +1,4 @@
-#include "../inc/ft_nmap.h"
-
-extern t_nmap nmap;
+#include "ft_nmap.h"
 
 uint16_t swap_uint16(uint16_t val) 
 {

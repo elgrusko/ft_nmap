@@ -1,8 +1,7 @@
-#include "../inc/ft_nmap.h"
-
-extern t_nmap nmap;
+#include "ft_nmap.h"
 
 // arbitrary code given by chatgpt (dangerous code)
+// lol
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
     int     offset;
@@ -10,6 +9,7 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
     char    *token;
 
     offset = 0;
+    // TODO remove strtok (forbidden function)
     token = strtok(nmap_ports, ",");
     sprintf(temp, "host %s and (tcp ", host);
     offset = strlen(temp);
@@ -23,7 +23,7 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
         }
         else
             sprintf(temp + offset,"port %s or ", token);
-        offset = strlen(temp);
+        offset = ft_strlen(temp);
         token = strtok(NULL, ",");
     }
     if (offset)
@@ -31,8 +31,8 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
         sprintf(temp + offset - 4,")");
         temp[offset - 3] = '\0';
     }
-    nmap.pcap_filter = malloc(sizeof(char) * (strlen(temp) + 1));
-    strncpy(nmap.pcap_filter, temp, strlen(temp) + 1);
+    nmap.pcap_filter = malloc(sizeof(char) * (ft_strlen(temp) + 1));
+    strncpy(nmap.pcap_filter, temp, ft_strlen(temp) + 1);
 }
 
 // parsing ports given in param

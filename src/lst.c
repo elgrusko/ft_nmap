@@ -1,6 +1,4 @@
-#include "../inc/ft_nmap.h"
-
-extern t_nmap nmap;
+#include "ft_nmap.h"
 
 t_target    *ft_create_elem(char *ip, struct addrinfo *res)
 {
@@ -16,15 +14,10 @@ t_target    *ft_create_elem(char *ip, struct addrinfo *res)
 
 void        ft_list_push_back(char *ip, struct addrinfo *res)
 {
-    t_target *tmp;
+    t_target **tmp;
 
-    tmp = nmap.targets;
-    if (tmp)
-    {
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = ft_create_elem(ip, res);
-    }
-    else
-        nmap.targets = ft_create_elem(ip, res);
+    tmp = &nmap.targets;
+    while (*tmp)
+        tmp = &(*tmp)->next;
+    *tmp = ft_create_elem(ip, res);
 }

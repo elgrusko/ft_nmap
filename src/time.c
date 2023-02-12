@@ -1,4 +1,4 @@
-#include "../inc/ft_nmap.h"
+#include "ft_nmap.h"
 
 void			wait_interval(struct timeval start, long interval)
 {

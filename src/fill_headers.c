@@ -1,6 +1,4 @@
-#include "../inc/ft_nmap.h"
-
-extern t_nmap nmap;
+#include "ft_nmap.h"
 
 unsigned short checksum(unsigned short *ptr,int nbytes) // chatGPT xd
 {
