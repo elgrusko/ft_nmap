@@ -8,8 +8,9 @@ void    packet_handler(u_char *user_data, const struct pcap_pkthdr *pkt_header, 
     struct ip           *ip_h;
     struct tcphdr       *tcp_h;
 
-    if (user_data && pkt_data && pkt_header)
-        puts(""); // to avoid warnings lol
+    (void)user_data;
+    (void)pkt_header;
+    (void)pkt_data;
     ip_h = (struct ip*)(pkt_data + 14); // skip 14 bytes for ethernet header
     tcp_h = (struct tcphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
     if (ip_h && tcp_h)
@@ -55,8 +56,7 @@ void    *scan_thread(void *arg)
     uint16_t        port_index;
     struct timeval  current_start_timestamp;
 
-    if (arg) // avoid warning while compiling
-        arg = arg;
+    (void)arg;
     while (1)
     {
         pthread_mutex_lock(&mutex_global);
@@ -83,8 +83,6 @@ void    *scan_thread(void *arg)
         }
         send_packet(ip_h);
         nmap.t_ports[port_index].src_port = START_SRC_PORT + nmap.t_ports[port_index].dst_port;
-        //usleep(30000 * ((nmap.speedup / 2) + 1)); // arbitraire. a changer
-        //wait_interval(current_start_timestamp, 1);
     }
     return (NULL);
 }
@@ -136,7 +134,6 @@ int     main(int argc, char **argv)
         ft_exerror(errbuf, errno);
     manage_filter(handle);
     pthread_create(&nmap.capture_thread, NULL, capture_thread, handle);
-
     while (nmap.targets)
     {
         while (nmap.scans)

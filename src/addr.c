@@ -68,7 +68,9 @@ int    get_network_interface(void)
     pcap_if_t       *tmp;
 	pcap_addr_t 	*a;
     char            error[PCAP_ERRBUF_SIZE]; /* Size defined in pcap.h */
+	//uint8_t			get_local;
 
+	//get_local = 0;
     tmp = NULL;
 	a = NULL;
     if (pcap_findalldevs(&interfaces, error) == -1)
@@ -78,7 +80,7 @@ int    get_network_interface(void)
         tmp = interfaces;
         while (tmp)
         {
-            if (tmp->flags & PCAP_IF_UP && tmp->flags & PCAP_IF_RUNNING && tmp->flags & PCAP_IF_CONNECTION_STATUS_CONNECTED)
+            if (tmp->flags & PCAP_IF_LOOPBACK || (tmp->flags & PCAP_IF_UP && tmp->flags & PCAP_IF_RUNNING && tmp->flags & PCAP_IF_CONNECTION_STATUS_CONNECTED))
             {
 				a = tmp->addresses;
 				while (a)

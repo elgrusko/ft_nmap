@@ -101,7 +101,10 @@ int    parse_ports(char **argv, uint8_t index)
         if (strchr(argv[index], ','))       // if it's ports separared by comma
         {
             if ((ports_list = ft_split(argv[index], ',')))
+            {
                 store_ports(ports_list);
+                ft_split_free(ports_list);
+            }
         }
         else if (strchr(argv[index], '-'))
             parse_range_ports(argv[index]);

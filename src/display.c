@@ -1,6 +1,7 @@
 #include "ft_nmap.h"
 
-char *get_service_name(int port, const char *protocol) {
+char *get_service_name(int port, const char *protocol)
+{
 	struct servent *service = getservbyport(port, protocol);
 
 	if (!service)
