@@ -6,7 +6,7 @@ int	create_tcp_socket(void)
 
 	if ((socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
 		return (-1);
-	nmap.tcp_socket_fd = socket_fd;
+	nmap.socket_tcp = socket_fd;
 	return (0);
 }
 
@@ -16,18 +16,25 @@ int	create_udp_socket(void)
 
 	if ((socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_UDP)) == -1)
 		return (-1);
-	nmap.udp_socket_fd = socket_fd;
+	nmap.socket_udp = socket_fd;
 	return (0);
 }
 
-void    send_packet(int sock, struct ip *ip_h)
+void    send_packet(struct iphdr *ip_h)
 {
     // a IP_HDRINCL call, to make sure that the kernel knows the header is included in the data, and doesn't insert its own header into the packet before our data 
     int         tmp;
+    const int   *val;
+	int			socket;
 
     tmp = 1;
-    setsockopt(sock, IPPROTO_IP, IP_HDRINCL, &tmp, sizeof (tmp));
-    if (sendto(sock, nmap.datagram, ip_h->ip_len, 0, (struct sockaddr *)&nmap.targets->sockaddr, sizeof(nmap.targets->sockaddr)) < 0)
+    val = &tmp;
+	if (nmap.current_scan_type == SCAN_UDP)
+		socket = nmap.socket_udp;
+	else
+		socket = nmap.socket_tcp;
+    setsockopt(socket, IPPROTO_IP, IP_HDRINCL, val, sizeof (tmp));
+    if (sendto(socket, nmap.datagram, ip_h->tot_len, 0, (struct sockaddr *)&nmap.targets->sockaddr, sizeof(nmap.targets->sockaddr)) < 0)
         fprintf(stderr, "%s", strerror(errno));
 }
 

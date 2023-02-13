@@ -16,7 +16,7 @@ void    display_ports(void)
 }
 
 //debug function
-void    print_bits(uint8_t octet)
+/*void    print_bits(uint8_t octet)
 {
     int z = 128, oct = octet;
 
@@ -30,6 +30,7 @@ void    print_bits(uint8_t octet)
     }
     puts("\n");
 }
+*/
 
 //debug function
 void        print_list(void)

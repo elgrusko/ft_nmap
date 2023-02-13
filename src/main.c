@@ -47,25 +47,16 @@ pcap_t      *manage_filter(pcap_t *handle)
     return (handle);
 }
 
-void    send_syn_first(struct tcphdr *tcp_h, struct ip *ip_h, uint16_t port_index)
-{
-    uint8_t flags_save;
-
-    flags_save = nmap.flags;
-    nmap.flags = FLAG_SYN;
-    fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
-    send_packet(nmap.tcp_socket_fd, ip_h);
-    nmap.flags = flags_save;
-}
-
 void    *scan_thread(void *arg)
 {
-    struct ip       *ip_h;
+    struct iphdr    *ip_h;
     struct tcphdr   *tcp_h;
+    struct udphdr   *udp_h;
     uint16_t        port_index;
     struct timeval  current_start_timestamp;
 
-    (void)arg;
+    if (arg) // avoid warning while compiling
+        arg = arg;
     while (1)
     {
         pthread_mutex_lock(&mutex_global);
@@ -78,15 +69,21 @@ void    *scan_thread(void *arg)
         port_index = get_available_port();
         pthread_mutex_unlock(&mutex_global);
         save_current_time(&current_start_timestamp);
-        ip_h = (struct ip*)nmap.datagram;
-        tcp_h = (struct tcphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
+        ip_h = (struct iphdr*)nmap.datagram;
         fill_ip_header(ip_h);
-        //if (nmap.current_scan_type == SCAN_ACK) // if ACK scan, then we have to send a SYN packet first
-        //    send_syn_first(tcp_h, ip_h, port_index);
-        fill_tcp_header(tcp_h, port_index, nmap.t_ports[port_index].dst_port);
-        send_packet(nmap.tcp_socket_fd, ip_h);
+        if (nmap.current_scan_type == SCAN_UDP)
+        {
+            udp_h = (struct udphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
+            fill_udp_header(udp_h, port_index, nmap.t_ports[port_index].dst_port);
+        }
+        else
+        {
+            tcp_h = (struct tcphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
+            fill_tcp_header(tcp_h, ip_h, port_index, nmap.t_ports[port_index].dst_port);
+        }
+        send_packet(ip_h);
         nmap.t_ports[port_index].src_port = START_SRC_PORT + nmap.t_ports[port_index].dst_port;
-        usleep(30000 * ((nmap.speedup / 2) + 1)); // arbitraire. a changer
+        //usleep(30000 * ((nmap.speedup / 2) + 1)); // arbitraire. a changer
         //wait_interval(current_start_timestamp, 1);
     }
     return (NULL);

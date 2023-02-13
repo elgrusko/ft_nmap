@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
+#include <netinet/udp.h>
 #include <pcap/pcap.h>
 #include <pthread.h>
 #include <pcap.h>
@@ -105,8 +106,8 @@ typedef struct              s_nmap
 {
     int                     speedup;        // 0 to 250 (threads)
     uint8_t                 flags;
-    int                     tcp_socket_fd;
-    int                     udp_socket_fd;
+    int                     socket_tcp;
+    int                     socket_udp;
     uint8_t                 current_scan_type;
     t_ports                 t_ports[MAX_PORT];
     uint16_t                remain_ports;
@@ -139,11 +140,12 @@ void	    display_request_time(struct timeval start, struct timeval end);
 //configure networking
 int         create_tcp_socket(void);
 int         create_udp_socket(void);
-void	    fill_ip_header(struct ip *ip_h);
-void	    fill_tcp_header(struct tcphdr *tcp_h, u_int16_t src_port, u_int16_t dst_port);
+void	    fill_udp_header(struct udphdr *udp_h, u_int16_t src_port, u_int16_t dst_port);
+void	    fill_ip_header(struct iphdr *ip_h);
+void	    fill_tcp_header(struct tcphdr *tcp_h, struct iphdr *ip_h, u_int16_t src_port, u_int16_t dst_port);
 int         interpret_addr(char *input);
 int         get_network_interface(void);
-void        send_packet(int sock, struct ip *ip_h);
+void        send_packet(struct iphdr *ip_h);
 
 //display
 void        print_result(void);
