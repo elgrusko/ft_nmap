@@ -60,6 +60,7 @@ void    reset_ports(void)
     {
         nmap.t_ports[index].src_port = 0;
         nmap.t_ports[index].scanned = 0;
+        ft_memset(&nmap.t_ports[index].state_res, 0, sizeof(t_state));
         index++;
     }
 }

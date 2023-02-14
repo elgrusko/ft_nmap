@@ -68,9 +68,7 @@ int    get_network_interface(void)
     pcap_if_t       *tmp;
 	pcap_addr_t 	*a;
     char            error[PCAP_ERRBUF_SIZE]; /* Size defined in pcap.h */
-	//uint8_t			get_local;
 
-	//get_local = 0;
     tmp = NULL;
 	a = NULL;
     if (pcap_findalldevs(&interfaces, error) == -1)
@@ -87,10 +85,18 @@ int    get_network_interface(void)
 				{
 					if (a->addr->sa_family == AF_INET)
 					{
-                    	nmap.string_src_ip = inet_ntoa(((struct sockaddr_in*)a->addr)->sin_addr);
-						nmap.interface = ft_strdup(tmp->name);
-						pcap_freealldevs(interfaces);
-						return (E_OK);
+						if (nmap.interface_localhost == NULL && tmp->flags & PCAP_IF_LOOPBACK) 
+							nmap.interface_localhost = ft_strdup(tmp->name);
+						else if (nmap.interface == NULL && (tmp->flags & PCAP_IF_UP && tmp->flags & PCAP_IF_RUNNING && tmp->flags & PCAP_IF_CONNECTION_STATUS_CONNECTED))
+						{
+							nmap.string_src_ip = inet_ntoa(((struct sockaddr_in*)a->addr)->sin_addr);
+							nmap.interface = ft_strdup(tmp->name);
+						}
+					}
+					if (nmap.interface_localhost && nmap.interface)
+					{
+							pcap_freealldevs(interfaces);
+							return (E_OK);
 					}
 					a = a->next;
 				}

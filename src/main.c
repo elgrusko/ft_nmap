@@ -111,9 +111,12 @@ int     main(int argc, char **argv)
 {
     uint8_t tmp_scans;
     pcap_t                  *handle;
+    pcap_t                  *handle_localhost;
+    uint8_t                 localhost[4] = {127, 0, 0, 1};
     char                    errbuf[PCAP_ERRBUF_SIZE];
 
     handle = NULL;
+    handle_localhost = NULL;
     tmp_scans = 0;
     if (getuid() != 0)
         return (ft_reterror("you must be root to use ft_nmap", 1));
@@ -127,8 +130,6 @@ int     main(int argc, char **argv)
         return (ft_reterror("no available interface found", 3));
     if (!nmap.targets)
         return (ft_reterror("no target. please check --help", 4));
-
-    display_scan_config();
     tmp_scans = nmap.scans;
     if (!(handle = pcap_open_live(nmap.interface, BUFSIZ, 1, 1000, errbuf)))
         ft_exerror(errbuf, errno);
@@ -136,6 +137,15 @@ int     main(int argc, char **argv)
     pthread_create(&nmap.capture_thread, NULL, capture_thread, handle);
     while (nmap.targets)
     {
+        if (memcmp(&nmap.targets->sockaddr.sin_addr, &localhost, 4) == 0) // je retrouve pas mon ft_memcmp
+        {
+            if (!(handle_localhost = pcap_open_live(nmap.interface_localhost, BUFSIZ, 1, 1000, errbuf))) // pour l'instant "lo" est en dur mais je vais utiliser pcap_findalldevs() apres
+                ft_exerror(errbuf, errno);
+            if (pcap_setfilter(handle_localhost, &nmap.filter) == -1)
+                ft_exerror(errbuf, errno);
+            pthread_create(&nmap.capture_thread, NULL, capture_thread, handle_localhost);
+        }
+        display_scan_config();
         while (nmap.scans)
         {
             set_correct_flags();
@@ -144,14 +154,14 @@ int     main(int argc, char **argv)
             reset_ports();
         }
         nmap.scans = tmp_scans;
-
         // get the next target and free the current one
         t_target *next_target = nmap.targets->next;
         free(nmap.targets->string_ip);
         free(nmap.targets);
         nmap.targets = next_target;
+        if (handle_localhost)
+            pcap_close(handle_localhost);
     }
-
     nmap.stop_capture = 1;
     pcap_close(handle);
     return (0);

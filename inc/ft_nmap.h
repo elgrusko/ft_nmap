@@ -66,16 +66,6 @@ enum errors {E_OK, E_ERR};
 enum scanned {E_NOT_SCANNED, E_SCANNED};
 enum scan_types {SYN, NUL, ACK, FIN, XMAS, UDP};
 
-typedef struct              s_ports_result // total ports state
-{
-    uint16_t                open_ports;
-    uint16_t                close_ports;
-    uint16_t                filtered_ports;
-    uint16_t                openfiltered_ports;
-    uint16_t                unfiltered_ports;
-}                           t_ports_result;
-
-
 // each scan result for each port
 typedef struct              s_state
 {
@@ -122,8 +112,8 @@ typedef struct              s_nmap
     uint8_t                 datagram[MAX_PACKET_SIZE];
     struct ip               ip_h;
     struct tcphdr           tcp_h;
-    t_ports_result          result;
     char                    *interface;
+    char                    *interface_localhost;
     struct timeval			starting_time;
 	struct timeval			ending_time;
     struct bpf_program		filter;
@@ -169,7 +159,6 @@ void        run_tcp_scan(void);
 
 // tools
 uint16_t    get_total_ports(void);
-void        get_total_state_ports(t_ports_result *result);
 uint16_t    swap_uint16(uint16_t val);
 
 // libft functions

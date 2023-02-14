@@ -47,18 +47,14 @@ void    print_result(void)
 {
     uint16_t        index = 0;
 
-    //get_total_state_ports(&nmap.result); // fonction to be updated since we use t_state struct
-    printf("\nScan result:\n");
-    printf("open: %d / close: %d / filtered: %d / open|filtered: %d / unfiltered %d\n", nmap.result.open_ports, nmap.result.close_ports, nmap.result.filtered_ports, nmap.result.openfiltered_ports, nmap.result.unfiltered_ports);
-    //if (nmap.result.open_ports || nmap.result.close_ports || nmap.result.filtered_ports || nmap.result.openfiltered_ports || nmap.result.unfiltered_ports)
-    //{
+    printf("\nScan result for %s:\n", nmap.targets->string_ip);
     printf("\nPORT\t STATE\n");
     while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
     {
         print_scans_type_res(index);
         index++;
     }
-    //}
+    printf("\n");
 }
 
 void    display_scan_config(void)

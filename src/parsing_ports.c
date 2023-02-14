@@ -12,6 +12,7 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
     // TODO remove strtok (forbidden function)
     token = strtok(nmap_ports, ",");
     sprintf(temp, "host %s and (tcp ", host);
+    printf("host is %s\n", host);
     offset = strlen(temp);
     while (token != NULL)
     {
