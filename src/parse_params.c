@@ -12,7 +12,8 @@ int     file_to_targets(char *filename)
             return (ft_reterror(strerror(errno), E_ERR));
         while (fgets(buffer, sizeof(buffer), fd) != NULL)
         {
-            buffer[strlen(buffer) - 1] = '\0'; // eat the newline fgets() stores
+            // TODO fix seems unsafe if string empty
+            buffer[ft_strlen(buffer) - 1] = '\0'; // eat the newline fgets() stores
             if (interpret_addr(buffer) != E_OK)
                 return (E_ERR);
         }
@@ -98,7 +99,7 @@ int    parse_ports(char **argv, uint8_t index)
     if (argv[index] != NULL)
     {
         nmap.string_ports = argv[index];
-        if (strchr(argv[index], ','))       // if it's ports separared by comma
+        if (*ft_find(argv[index], ','))       // if it's ports separared by comma
         {
             if ((ports_list = ft_split(argv[index], ',')))
             {
@@ -106,7 +107,7 @@ int    parse_ports(char **argv, uint8_t index)
                 ft_split_free(ports_list);
             }
         }
-        else if (strchr(argv[index], '-'))
+        else if (*ft_find(argv[index], '-'))
             parse_range_ports(argv[index]);
         else                               // only one port
         {

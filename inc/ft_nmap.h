@@ -176,5 +176,8 @@ void	    *ft_memcpy(void *dest, const void *src, size_t n);
 int		    ft_atoi(const char *str);
 char	    **ft_split(char const *s, char c);
 void	    ft_split_free(char **split);
+void	    ft_add_bytes(char **src, const char *bytes, size_t nb_bytes);
+void    	ft_add_str(char **src, const char *str);
+char        *ft_find(char *s, char c);
 
 # endif

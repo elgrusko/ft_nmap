@@ -1,39 +1,37 @@
 #include "ft_nmap.h"
 
-// arbitrary code given by chatgpt (dangerous code)
-// lol
+// 0-1,3-7,6 => portrange 0-1 or portrange 3-7 or port 6
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
-    int     offset;
-    char    temp[1000]; // a changer aussi
-    char    *token;
+    printf("nmap_ports: %s\n", nmap_ports);
+    printf("host: %s\n", host);
 
-    offset = 0;
-    // TODO remove strtok (forbidden function)
-    token = strtok(nmap_ports, ",");
-    sprintf(temp, "host %s and (tcp ", host);
-    printf("host is %s\n", host);
-    offset = strlen(temp);
-    while (token != NULL)
-    {
-        char *range = strchr(token, '-');
-        if (range)
-        {
-            *range = '\0';
-            sprintf(temp + offset,"portrange %s-%s or ", token, range + 1);
+    nmap.pcap_filter = ft_strdup("host ");
+    ft_add_str(&nmap.pcap_filter, host);
+    ft_add_str(&nmap.pcap_filter, " and (tcp ");
+
+    while (*nmap_ports) {
+        char *end = ft_find(nmap_ports, ',');
+
+        if (*end) {
+            *end = '\0';
+            end++;
         }
+
+        if (*ft_find(nmap_ports, '-'))
+            ft_add_str(&nmap.pcap_filter, "portrange ");
         else
-            sprintf(temp + offset,"port %s or ", token);
-        offset = ft_strlen(temp);
-        token = strtok(NULL, ",");
+            ft_add_str(&nmap.pcap_filter, "port ");
+        ft_add_str(&nmap.pcap_filter, nmap_ports);
+        if (*end)
+            ft_add_str(&nmap.pcap_filter, " or ");
+
+        nmap_ports = end;
     }
-    if (offset)
-    {
-        sprintf(temp + offset - 4,")");
-        temp[offset - 3] = '\0';
-    }
-    nmap.pcap_filter = malloc(sizeof(char) * (ft_strlen(temp) + 1));
-    strncpy(nmap.pcap_filter, temp, ft_strlen(temp) + 1);
+
+    ft_add_str(&nmap.pcap_filter, ")");
+
+    printf("pcap_filter: %s\n", nmap.pcap_filter);
 }
 
 // parsing ports given in param
@@ -49,7 +47,7 @@ void   store_ports(char **ports_list)
     {
         while (ports_list[index])
         {
-            if (strchr(ports_list[index], '-')) // if it's a range
+            if (*ft_find(ports_list[index], '-')) // if it's a range
                 parse_range_ports(ports_list[index]);
             else
             {   
