@@ -123,7 +123,7 @@ int     main(int argc, char **argv)
     if (argc < 2 || parse_parameters(argv) != 0)
         return (ft_reterror(USAGE, 2));
     if (nmap.flags & FLAG_HELP)
-        return (ft_reterror(HELP, 0));
+        return (ft_reterror(USAGE, 0));
     if (create_tcp_socket() < 0 || create_udp_socket() < 0)
         return (ft_reterror(strerror(errno), errno));
     if (get_network_interface() != 0)

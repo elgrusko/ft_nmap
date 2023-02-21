@@ -3,9 +3,6 @@
 // 0-1,3-7,6 => portrange 0-1 or portrange 3-7 or port 6
 void    nmap_to_pcap(char *nmap_ports, const char *host)
 {
-    printf("nmap_ports: %s\n", nmap_ports);
-    printf("host: %s\n", host);
-
     nmap.pcap_filter = ft_strdup("host ");
     ft_add_str(&nmap.pcap_filter, host);
     ft_add_str(&nmap.pcap_filter, " and (tcp ");
@@ -30,8 +27,6 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
     }
 
     ft_add_str(&nmap.pcap_filter, ")");
-
-    printf("pcap_filter: %s\n", nmap.pcap_filter);
 }
 
 // parsing ports given in param

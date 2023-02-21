@@ -21,17 +21,27 @@
 #include <poll.h>
 #include <errno.h>
 
-#define USAGE "./ft_nmap [--help] [--ports [NUMBER/RANGED]] --file FILE [--speedup [NUMBER]] [--scan [TYPE]]"
-#define MAX_PACKET_SIZE 4096
+#define USAGE    "\n\
+Usage: ft_nmap [Scan Type(s)] [Options] {target specification}\n\
+\n\
+TARGET SPECIFICATION:\n\
+  --ip ip addresses to scan in dot format \n\
+  --file File name containing IP addresses to scan, \n\
+\n\
+SCAN TECHNIQUES:\n\
+  --scan SYN/NULL/FIN/XMAS/ACK/UDP\n\
+\n\
+PORT SPECIFICATION:\n\
+  --ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15) \n\
+\n\
+TIMING AND PERFORMANCE:\n\
+  --speedup [250 max] number of parallel threads to use\n\
+\n\
+MISC:\n\
+  --help Print this help screen\n\
+"
 
-#define HELP    "Help Screen \n\
-ft_nmap [OPTIONS] \n\
- --help Print this help screen \n\
- --ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15) \n\
- --ip ip addresses to scan in dot format \n\
- --file File name containing IP addresses to scan, \n\
- --speedup [250 max] number of parallel threads to use\n\
- --scan SYN/NULL/FIN/XMAS/ACK/UDP"
+#define MAX_PACKET_SIZE 4096
 
 #define SCAN_SYN  0b00000001
 #define SCAN_NULL 0b00000010
