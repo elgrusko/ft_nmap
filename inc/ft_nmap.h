@@ -15,6 +15,7 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <netinet/ip_icmp.h>
 #include <pcap/pcap.h>
 #include <pthread.h>
 #include <pcap.h>
@@ -125,17 +126,18 @@ typedef struct              s_nmap
     char                    *interface;
     char                    *interface_localhost;
     struct timeval			starting_time;
-	struct timeval			ending_time;
-    struct bpf_program		filter;
+	  struct timeval			ending_time;
+    struct bpf_program		filter_tcp;
+    struct bpf_program      filter_udp;
 }                           t_nmap;
 
 extern t_nmap nmap;
 
 //time
-void	    wait_interval(struct timeval start, long interval);
-double	    calcul_request_time(struct timeval start, struct timeval end);
+void 	    wait_microseconds(unsigned int microseconds);
+void	    wait_seconds(unsigned int seconds);
+void	    display_total_time(void);
 void        save_current_time(struct timeval *destination);
-void	    display_request_time(struct timeval start, struct timeval end);
 
 //configure networking
 int         create_tcp_socket(void);
@@ -164,8 +166,9 @@ void        reset_ports(void);
 void        check_responseless_ports(void);
 uint16_t    get_available_port(void);
 void        update_ports_list(struct tcphdr *tcp_h);
+void        update_ports_list_udp(struct icmphdr *icmp_h);
 void        set_correct_flags(void);
-void        run_tcp_scan(void);
+void        run_scan(void);
 
 // tools
 uint16_t    get_total_ports(void);

@@ -44,7 +44,12 @@ void    print_scans_type_res(t_ports *port)
         printf("ACK(%s) ", state_to_string(port->state_res.ack_res));
     if (port->state_res.udp_res)
         printf("UDP(%s) ", state_to_string(port->state_res.udp_res));
-    printf("\t%s", get_service_name(port->dst_port, "tcp"));
+
+    if (nmap.current_scan_type == SCAN_UDP)
+        printf("\t%s", get_service_name(port->dst_port, "udp"));
+    else
+        printf("\t%s", get_service_name(port->dst_port, "tcp"));
+
     printf("\n");
 }
 
@@ -81,6 +86,6 @@ void    display_scan_config(void)
     if (nmap.scans & SCAN_ACK)
         printf("ACK ");
     if (nmap.scans & SCAN_UDP)
-        printf("SYN ");
+        printf("UDP ");
     printf("\n");
 }
