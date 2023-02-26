@@ -15,33 +15,24 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <netinet/ip_icmp.h>
 #include <pcap/pcap.h>
 #include <pthread.h>
 #include <pcap.h>
 #include <poll.h>
 #include <errno.h>
 
-#define USAGE    "\n\
-Usage: ft_nmap [Scan Type(s)] [Options] {target specification}\n\
-\n\
-TARGET SPECIFICATION:\n\
-  --ip ip addresses to scan in dot format \n\
-  --file File name containing IP addresses to scan, \n\
-\n\
-SCAN TECHNIQUES:\n\
-  --scan SYN/NULL/FIN/XMAS/ACK/UDP\n\
-\n\
-PORT SPECIFICATION:\n\
-  --ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15) \n\
-\n\
-TIMING AND PERFORMANCE:\n\
-  --speedup [250 max] number of parallel threads to use\n\
-\n\
-MISC:\n\
-  --help Print this help screen\n\
-"
-
+#define USAGE "./ft_nmap [--help] [--ports [NUMBER/RANGED]] --file FILE [--speedup [NUMBER]] [--scan [TYPE]]"
 #define MAX_PACKET_SIZE 4096
+
+#define HELP    "Help Screen \n\
+ft_nmap [OPTIONS] \n\
+ --help Print this help screen \n\
+ --ports ports to scan (eg: 1-10 or 1,2,3 or 1,5-15) \n\
+ --ip ip addresses to scan in dot format \n\
+ --file File name containing IP addresses to scan, \n\
+ --speedup [250 max] number of parallel threads to use\n\
+ --scan SYN/NULL/FIN/XMAS/ACK/UDP"
 
 #define SCAN_SYN  0b00000001
 #define SCAN_NULL 0b00000010
@@ -126,16 +117,17 @@ typedef struct              s_nmap
     char                    *interface_localhost;
     struct timeval			starting_time;
 	struct timeval			ending_time;
-    struct bpf_program		filter;
+    struct bpf_program		filter_tcp;
+    struct bpf_program      filter_udp;
 }                           t_nmap;
 
 extern t_nmap nmap;
 
 //time
-void	    wait_interval(struct timeval start, long interval);
-double	    calcul_request_time(struct timeval start, struct timeval end);
+void 	    wait_microseconds(unsigned int microseconds);
+void	    wait_seconds(unsigned int seconds);
+void	    display_total_time(void);
 void        save_current_time(struct timeval *destination);
-void	    display_request_time(struct timeval start, struct timeval end);
 
 //configure networking
 int         create_tcp_socket(void);
@@ -164,8 +156,9 @@ void        reset_ports(void);
 void        check_responseless_ports(void);
 uint16_t    get_available_port(void);
 void        update_ports_list(struct tcphdr *tcp_h);
+void        update_ports_list_udp(struct icmphdr *icmp_h);
 void        set_correct_flags(void);
-void        run_tcp_scan(void);
+void        run_scan(void);
 
 // tools
 uint16_t    get_total_ports(void);
@@ -186,8 +179,5 @@ void	    *ft_memcpy(void *dest, const void *src, size_t n);
 int		    ft_atoi(const char *str);
 char	    **ft_split(char const *s, char c);
 void	    ft_split_free(char **split);
-void	    ft_add_bytes(char **src, const char *bytes, size_t nb_bytes);
-void    	ft_add_str(char **src, const char *str);
-char        *ft_find(char *s, char c);
 
 # endif

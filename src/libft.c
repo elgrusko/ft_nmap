@@ -193,36 +193,3 @@ char		**ft_split(char const *s, char c)
 	split[j] = 0;
 	return (split);
 }
-
-// Replace src by a newly allocated string containing the concatenation of src and bytes.
-// The old src is freed
-void	ft_add_bytes(char **src, const char *bytes, size_t nb_bytes) {
-	if (!*src) {
-		*src = ft_strdup(bytes);
-		return ;
-	}
-
-	if (!bytes)
-		return ;
-
-	char *concat = malloc(ft_strlen(*src) + nb_bytes + 1);
-
-	ft_memcpy(concat, *src, ft_strlen(*src));
-	ft_memcpy(concat + ft_strlen(*src), bytes, nb_bytes);
-	concat[ft_strlen(*src) + nb_bytes] = '\0';
-
-	free(*src);
-	*src = concat;
-}
-
-// Replace src by a newly allocated string containing the concatenation of src and str.
-// The old src is freed
-void	ft_add_str(char **src, const char *str) {
-	ft_add_bytes(src, str, ft_strlen(str));
-}
-
-char	*ft_find(char *s, char c) {
-	while (*s && *s != c)
-		s++;
-	return s;
-}

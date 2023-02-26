@@ -1,5 +1,27 @@
 #include "ft_nmap.h"
 
+void    update_ports_list_udp(struct icmphdr *icmp_h)
+{
+    uint16_t        port;
+    uint16_t        index;
+    struct udphdr   *udp_h;
+
+    index = 0;
+    udp_h = (struct udphdr*)((u_int8_t *)icmp_h + sizeof(struct icmphdr) + sizeof(struct iphdr));
+    if (udp_h)
+    {
+        //print_memory(udp_h, sizeof(struct udphdr));
+        port = swap_uint16(udp_h->dest);
+        while (nmap.t_ports[index].dst_port != port && index < MAX_PORT)
+            index++;
+        if (icmp_h->type == 3 && icmp_h->code == 3)
+            nmap.t_ports[index].state_res.udp_res |= CLOSE;
+        else if (icmp_h->type == 3 && (icmp_h->code == 1 || icmp_h->code == 2 || icmp_h->code == 9 || icmp_h->code == 10 || icmp_h->code == 13))
+            nmap.t_ports[index].state_res.udp_res |= FILTERED; // jamais eu l'occasion de tomber sur ce cas... (https://nmap.org/book/scan-methods-udp-scan.html)
+    }
+
+}
+
 void    update_ports_list(struct tcphdr *tcp_h)
 {
     uint16_t    port;
@@ -46,6 +68,8 @@ void    check_responseless_ports(void)
             nmap.t_ports[index].state_res.xmas_res |= OPENFILTERED;
         if (nmap.current_scan_type == SCAN_ACK && nmap.t_ports[index].state_res.ack_res == NO_RESPONSE)
             nmap.t_ports[index].state_res.ack_res |= FILTERED;
+        if (nmap.current_scan_type == SCAN_UDP && nmap.t_ports[index].state_res.udp_res == NO_RESPONSE)
+            nmap.t_ports[index].state_res.udp_res |= OPENFILTERED;    
         index++;
     }
 }

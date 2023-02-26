@@ -28,7 +28,7 @@ void    display_ports(void)
             write(1, "0", 1);
         z >>= 1;
     }
-    printf("\n");
+    puts("\n");
 }
 */
 

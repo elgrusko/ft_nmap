@@ -12,39 +12,37 @@ char *get_service_name(int port, const char *protocol)
 char   *state_to_string(u_int8_t state)
 {
     if (state & OPEN)
-        return("\x1b[1;92mopen\x1b[0m");
+        return("open");
     if (state & CLOSE)
-        return("\x1b[1;91mclose\x1b[0m");
+        return("close");
     if (state & FILTERED)
-        return("\x1b[1;90mfiltered\x1b[0m");
+        return("filtered");
     if (state & UNFILTERED)
-        return("\x1b[1;90munfiltered\x1b[0m");
+        return("unfiltered");
     if (state & OPENFILTERED)
-        return("\x1b[1;90mopen|filtered\x1b[0m");
+        return("open|filtered");
     return (NULL);
 }
 
-void    print_scans_type_res(t_ports *port)
+void    print_scans_type_res(uint16_t index)
 {
-    int    res = (port->state_res.syn_res | port->state_res.null_res | port->state_res.fin_res | port->state_res.xmas_res | port->state_res.ack_res | port->state_res.udp_res);
-
-    if (!(res & ~(CLOSE)) || res & CLOSE)
-        return ;
-
-    printf("%d\t", port->dst_port);
-    if (port->state_res.syn_res)
-        printf("SYN(%s) ", state_to_string(port->state_res.syn_res));
-    if (port->state_res.null_res)
-        printf("NULL(%s) ", state_to_string(port->state_res.null_res));
-    if (port->state_res.fin_res)
-        printf("FIN(%s) ", state_to_string(port->state_res.fin_res));
-    if (port->state_res.xmas_res)
-        printf("XMAS(%s) ", state_to_string(port->state_res.xmas_res));
-    if (port->state_res.ack_res)
-        printf("ACK(%s) ", state_to_string(port->state_res.ack_res));
-    if (port->state_res.udp_res)
-        printf("UDP(%s) ", state_to_string(port->state_res.udp_res));
-    printf("\t%s", get_service_name(port->dst_port, "tcp"));
+    printf("%d\t", nmap.t_ports[index].dst_port);
+    if (nmap.t_ports[index].state_res.syn_res)
+        printf("SYN(%s) ", state_to_string(nmap.t_ports[index].state_res.syn_res));
+    if (nmap.t_ports[index].state_res.null_res)
+        printf("NULL(%s) ", state_to_string(nmap.t_ports[index].state_res.null_res));
+    if (nmap.t_ports[index].state_res.fin_res)
+        printf("FIN(%s) ", state_to_string(nmap.t_ports[index].state_res.fin_res));
+    if (nmap.t_ports[index].state_res.xmas_res)
+        printf("XMAS(%s) ", state_to_string(nmap.t_ports[index].state_res.xmas_res));
+    if (nmap.t_ports[index].state_res.ack_res)
+        printf("ACK(%s) ", state_to_string(nmap.t_ports[index].state_res.ack_res));
+    if (nmap.t_ports[index].state_res.udp_res)
+        printf("UDP(%s) ", state_to_string(nmap.t_ports[index].state_res.udp_res));
+    if (nmap.current_scan_type == SCAN_UDP)
+        printf("\t%s", get_service_name(nmap.t_ports[index].dst_port, "udp"));
+    else
+        printf("\t%s", get_service_name(nmap.t_ports[index].dst_port, "tcp"));
     printf("\n");
 }
 
@@ -56,7 +54,7 @@ void    print_result(void)
     printf("\nPORT\t STATE\n");
     while (nmap.t_ports[index].dst_port != 0 && index < MAX_PORT)
     {
-        print_scans_type_res(&nmap.t_ports[index]);
+        print_scans_type_res(index);
         index++;
     }
     printf("\n");
@@ -81,6 +79,6 @@ void    display_scan_config(void)
     if (nmap.scans & SCAN_ACK)
         printf("ACK ");
     if (nmap.scans & SCAN_UDP)
-        printf("SYN ");
+        printf("UDP ");
     printf("\n");
 }
