@@ -5,7 +5,7 @@ CC =		gcc
 
 CFLAGS =	-I inc -O3
 CFLAGS +=	-Wall -Wextra -Werror
-CFLAGS +=	-fsanitize=address -g
+#CFLAGS +=	-fsanitize=address -g
 
 SRCS =		src/main.c \
 			src/manage_ports.c \

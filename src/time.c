@@ -9,7 +9,7 @@ void wait_microseconds(unsigned int microseconds)
     select(0, NULL, NULL, NULL, &timeout);
 }
 
-void	wait_seconds(unsigned int seconds) // to bypass sleep()
+void	wait_seconds(unsigned int seconds)
 {
 	struct timeval timeout;
 	timeout.tv_sec = seconds;
@@ -29,5 +29,5 @@ void	display_total_time(void)
 	double	elapsed_time;
 
 	elapsed_time = nmap.ending_time.tv_sec - nmap.starting_time.tv_sec;
-	printf("Scan took %.0lf secondss\n", elapsed_time);
+	printf("Scan took %.0lf seconds\n", elapsed_time);
 }

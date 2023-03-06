@@ -1,12 +1,14 @@
 #include "ft_nmap.h"
 
 // 0-1,3-7,6 => portrange 0-1 or portrange 3-7 or port 6
-void    nmap_to_pcap(char *nmap_ports, const char *host)
+void    nmap_to_pcap(char *nmap_ports, const char *host, uint8_t current_scan_type)
 {
     nmap.pcap_filter = ft_strdup("host ");
     ft_add_str(&nmap.pcap_filter, host);
-    ft_add_str(&nmap.pcap_filter, " and (tcp ");
-
+    if (current_scan_type != SCAN_UDP)
+        ft_add_str(&nmap.pcap_filter, " and (tcp ");
+    else
+        ft_add_str(&nmap.pcap_filter, " and icmp or (udp ");
     while (*nmap_ports) {
         char *end = ft_find(nmap_ports, ',');
 
@@ -25,7 +27,6 @@ void    nmap_to_pcap(char *nmap_ports, const char *host)
 
         nmap_ports = end;
     }
-
     ft_add_str(&nmap.pcap_filter, ")");
 }
 

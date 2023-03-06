@@ -20,7 +20,7 @@ int	create_udp_socket(void)
 	return (0);
 }
 
-void    send_packet(struct iphdr *ip_h)
+void    send_packet(struct iphdr *ip_h, uint8_t payload_len)
 {
     // a IP_HDRINCL call, to make sure that the kernel knows the header is included in the data, and doesn't insert its own header into the packet before our data 
     int         tmp;
@@ -33,8 +33,10 @@ void    send_packet(struct iphdr *ip_h)
 		socket = nmap.socket_udp;
 	else
 		socket = nmap.socket_tcp;
+	if (payload_len)
+		ip_h->tot_len = ip_h->tot_len + payload_len;
     setsockopt(socket, IPPROTO_IP, IP_HDRINCL, val, sizeof (tmp));
-    if (sendto(socket, nmap.datagram, ip_h->tot_len, 0, (struct sockaddr *)&nmap.targets->sockaddr, sizeof(nmap.targets->sockaddr)) < 0)
+	if (sendto(socket, nmap.datagram, ip_h->tot_len, 0, (struct sockaddr *)&nmap.targets->sockaddr, sizeof(nmap.targets->sockaddr)) < 0)
         fprintf(stderr, "%s", strerror(errno));
 }
 

@@ -1,11 +1,5 @@
 #include "ft_nmap.h"
 
-/*
-Todo:
--afficher temps ecoule pendant le scan
--parser 
-*/
-
 int     expected_port(uint16_t port)
 {
     uint16_t index;
@@ -55,7 +49,7 @@ void    packet_handler(u_char *user_data, const struct pcap_pkthdr *pkt_header, 
     else if (ip_h && ip_h->protocol == IPPROTO_UDP)
     {
         udp_h = (struct udphdr*)((u_int8_t *)ip_h + sizeof(struct iphdr));
-        if (udp_h) // j'ai jamais eu l'occasion de tomber sur ce cas
+        if (udp_h)
         {
             port = swap_uint16(udp_h->source);
             if (expected_port(port) == E_OK)
@@ -83,14 +77,48 @@ void *capture_thread(void *arg)
     return (NULL);
 }
 
+
+// en attendant de faire un truc plus propre...
+uint16_t    fill_payload(struct udphdr *udp_h, uint16_t port)
+{
+    if (port == 7)
+    {
+        ft_memcpy(udp_h + 1, "\x0D\x0A\x0D\x0A", 4); 
+        return (4);
+    }
+    if (port == 53)
+    {
+        ft_memcpy(udp_h + 1, "\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00", 12); 
+        return (12);        
+    }
+    if (port == 80)
+    {
+        ft_memcpy(udp_h + 1, "\x0d\x31\x32\x33\x34\x35\x36\x37\x38\x51\x39\x39\x39\x00", 14);
+        return (14);
+    }
+    if (port == 111)
+    {
+        ft_memcpy(udp_h + 1, "\x72\xFE\x1D\x13\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x86\xA0\x00\x01\x97\x7C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 40);
+        return (40);
+    }
+    if (port == 123)
+    {
+        ft_memcpy(udp_h + 1, "\xE3\x00\x04\xFA\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xC5\x4F\x23\x4B\x71\xB1\x52\xF3", 48);
+        return (48);
+    }
+    return (0);
+}
+
 void    *scan_thread(void *arg)
 {
     struct iphdr    *ip_h;
     struct tcphdr   *tcp_h;
     struct udphdr   *udp_h;
     uint16_t        port_index;
+    uint16_t        payload_len;
 
     (void)arg;
+    payload_len = 0;
     while (1)
     {
         pthread_mutex_lock(&mutex_global);
@@ -107,14 +135,16 @@ void    *scan_thread(void *arg)
         if (nmap.current_scan_type == SCAN_UDP)
         {
             udp_h = (struct udphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
-            fill_udp_header(udp_h, port_index, nmap.t_ports[port_index].dst_port);
+            payload_len = fill_payload(udp_h, nmap.t_ports[port_index].dst_port);
+            fill_udp_header(udp_h, port_index, nmap.t_ports[port_index].dst_port, payload_len);
+            send_packet(ip_h, payload_len);
         }
         else
         {
             tcp_h = (struct tcphdr*)((u_int8_t *)ip_h + (5 * sizeof(u_int32_t)));
             fill_tcp_header(tcp_h, ip_h, port_index, nmap.t_ports[port_index].dst_port);
+            send_packet(ip_h, 0);
         }
-        send_packet(ip_h);
         nmap.t_ports[port_index].src_port = START_SRC_PORT + nmap.t_ports[port_index].dst_port;
         if (nmap.current_scan_type == SCAN_UDP)
             wait_seconds(1);
@@ -126,28 +156,15 @@ void    apply_filters(pcap_t *handle, pcap_t *handle_localhost)
 {
     char     errbuf[PCAP_ERRBUF_SIZE];
 
-    if (nmap.current_scan_type != SCAN_UDP)
-    {
-        if (nmap.pcap_filter == NULL)
-            nmap_to_pcap(nmap.string_ports, nmap.string_src_ip);
-        if (pcap_compile(handle, &nmap.filter_tcp, nmap.pcap_filter, 0, PCAP_NETMASK_UNKNOWN) == -1)
+    if (nmap.pcap_filter == NULL)
+        nmap_to_pcap(nmap.string_ports, nmap.string_src_ip, nmap.current_scan_type);
+    if (pcap_compile(handle, &nmap.filter_tcp, nmap.pcap_filter, 0, PCAP_NETMASK_UNKNOWN) == -1)
+        ft_exerror(errbuf, errno);
+    if (pcap_setfilter(handle, &nmap.filter_tcp) == -1)
+        ft_exerror(errbuf, errno);
+    if (handle_localhost != NULL)
+        if (pcap_setfilter(handle_localhost, &nmap.filter_tcp) == -1) // apply same filters than with the "main" interface
             ft_exerror(errbuf, errno);
-        if (pcap_setfilter(handle, &nmap.filter_tcp) == -1)
-            ft_exerror(errbuf, errno);
-        if (handle_localhost != NULL)
-            if (pcap_setfilter(handle_localhost, &nmap.filter_tcp) == -1) // apply same filters than with the "main" interface
-                ft_exerror(errbuf, errno);
-    }
-    else // voir si peut faire un truc plus propre ? 
-    {
-        if (pcap_compile(handle, &nmap.filter_udp, "host 192.168.1.30 and (udp or icmp)", 0, PCAP_NETMASK_UNKNOWN) == -1)
-            ft_exerror(errbuf, errno);
-        if (pcap_setfilter(handle, &nmap.filter_udp) == -1)
-            ft_exerror(errbuf, errno);
-        if (handle_localhost != NULL)
-            if (pcap_setfilter(handle_localhost, &nmap.filter_udp) == -1) // apply same filters than with the "main" interface
-                ft_exerror(errbuf, errno);
-    }
 }
 
 void    run_scan(void)
@@ -200,9 +217,9 @@ int     main(int argc, char **argv)
     while (nmap.targets)
     {
         save_current_time(&nmap.starting_time);
-        if (memcmp(&nmap.targets->sockaddr.sin_addr, &localhost, 4) == 0) // je retrouve pas mon ft_memcmp
+        if (memcmp(&nmap.targets->sockaddr.sin_addr, &localhost, 4) == 0) // je retrouve pas mon ft_memcmp xd
         {
-            if (!(handle_localhost = pcap_open_live(nmap.interface_localhost, BUFSIZ, 1, 1000, errbuf))) // pour l'instant "lo" est en dur mais je vais utiliser pcap_findalldevs() apres
+            if (!(handle_localhost = pcap_open_live(nmap.interface_localhost, BUFSIZ, 1, 1000, errbuf)))
                 ft_exerror(errbuf, errno);
             pthread_create(&nmap.capture_thread, NULL, capture_thread, handle_localhost);
         }
@@ -224,7 +241,7 @@ int     main(int argc, char **argv)
         free(nmap.targets);
         nmap.targets = next_target;
         if (handle_localhost)
-            pcap_close(handle_localhost); // peut-etre remettre a NULL ensuite ?
+            pcap_close(handle_localhost);
     }
     nmap.stop_capture = 1;
     pcap_close(handle);

@@ -134,20 +134,20 @@ typedef struct              s_nmap
 extern t_nmap nmap;
 
 //time
-void 	    wait_microseconds(unsigned int microseconds);
-void	    wait_seconds(unsigned int seconds);
-void	    display_total_time(void);
+void 	      wait_microseconds(unsigned int microseconds);
+void	      wait_seconds(unsigned int seconds);
+void	      display_total_time(void);
 void        save_current_time(struct timeval *destination);
 
 //configure networking
 int         create_tcp_socket(void);
 int         create_udp_socket(void);
-void	    fill_udp_header(struct udphdr *udp_h, u_int16_t src_port, u_int16_t dst_port);
-void	    fill_ip_header(struct iphdr *ip_h);
-void	    fill_tcp_header(struct tcphdr *tcp_h, struct iphdr *ip_h, u_int16_t src_port, u_int16_t dst_port);
+void	      fill_udp_header(struct udphdr *udp_h, u_int16_t src_port, u_int16_t dst_port, u_int16_t payload_len);
+void	      fill_ip_header(struct iphdr *ip_h);
+void	      fill_tcp_header(struct tcphdr *tcp_h, struct iphdr *ip_h, u_int16_t src_port, u_int16_t dst_port);
 int         interpret_addr(char *input);
 int         get_network_interface(void);
-void        send_packet(struct iphdr *ip_h);
+void        send_packet(struct iphdr *ip_h, uint8_t payload_len);
 
 //display
 void        print_result(void);
@@ -156,7 +156,7 @@ void        display_scan_config(void);
 void        print_memory(void *memory, int size);
 
 // parameters parsing
-void        nmap_to_pcap(char *nmap_ports, const char *host);
+void        nmap_to_pcap(char *nmap_ports, const char *host, uint8_t current_scan_type);
 int         scan_to_flag(char **argv, uint8_t index);
 void        store_ports(char **ports_list);
 void        parse_range_ports(char *range);

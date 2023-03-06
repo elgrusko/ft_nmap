@@ -50,24 +50,29 @@ void	fill_ip_header(struct iphdr *ip_h)
     ip_h->version = 4;
 	ip_h->ihl = sizeof(*ip_h) >> 2; // 5*4 = 20 bytes. This field is only 4 bits (half-byte)
 	ip_h->tos = 0;
-	ip_h->tot_len = sizeof(struct ip) + sizeof(struct tcphdr); // 20+20 = 40 bytes
-	ip_h->id = htons(0); // we don't except to defragment/refragment packet
+	ip_h->id = htons(0); // we don't except to defragment/refragment packet so we can't set 0
 	ip_h->frag_off = 0;
 	ip_h->ttl = 64;
 	if (nmap.current_scan_type == SCAN_UDP)
+	{
 		ip_h->protocol = IPPROTO_UDP;
+		ip_h->tot_len = sizeof(struct iphdr) + sizeof(struct udphdr); // 20+8 = 28 bytes (without payload)
+	}
 	else
+	{
+		ip_h->tot_len = sizeof(struct iphdr) + sizeof(struct tcphdr); // 20+20 = 40 bytes
 		ip_h->protocol = IPPROTO_TCP;
+	}
 	ip_h->check = 0;
 	inet_pton(AF_INET, nmap.string_src_ip, &ip_h->saddr);
 	ft_memcpy(&ip_h->daddr, &nmap.targets->sockaddr.sin_addr, sizeof(ip_h->daddr));
 }
 
-void	fill_udp_header(struct udphdr *udp_h, u_int16_t src_port, u_int16_t dst_port)
+void	fill_udp_header(struct udphdr *udp_h, u_int16_t src_port, u_int16_t dst_port, u_int16_t payload_len)
 {
 	udp_h->source = htons(START_SRC_PORT + src_port);
 	udp_h->dest = htons(dst_port);
-	udp_h->len = htons(sizeof(struct udphdr));
+	udp_h->len = htons(sizeof(struct udphdr) + payload_len);
 	udp_h->check = 0;
 }
 
