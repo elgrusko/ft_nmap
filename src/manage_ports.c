@@ -12,7 +12,7 @@ void    update_ports_list_udp(struct icmphdr *icmp_h)
     {
         //print_memory(udp_h, sizeof(struct udphdr));
         port = swap_uint16(udp_h->dest);
-        while (nmap.t_ports[index].dst_port != port && index < MAX_PORT)
+        while (index < MAX_PORT && nmap.t_ports[index].dst_port != port)
             index++;
         if (icmp_h->type == 3 && icmp_h->code == 3)
             nmap.t_ports[index].state_res.udp_res |= CLOSE;
